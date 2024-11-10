@@ -25,6 +25,7 @@ namespace PR5_Boboev.Models
             throw new UnintentionalCodeFirstException();
         }
     
+        public virtual DbSet<role> role { get; set; }
         public virtual DbSet<sysdiagrams> sysdiagrams { get; set; }
         public virtual DbSet<Авторизация> Авторизация { get; set; }
         public virtual DbSet<Договор> Договор { get; set; }

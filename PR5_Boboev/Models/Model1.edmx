@@ -5,6 +5,13 @@
     <!-- SSDL content -->
     <edmx:StorageModels>
       <Schema Namespace="Хранилище Model" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="role">
+          <Key>
+            <PropertyRef Name="id role" />
+          </Key>
+          <Property Name="id role" Type="int" Nullable="false" />
+          <Property Name="role" Type="varchar" MaxLength="50" />
+        </EntityType>
         <EntityType Name="sysdiagrams">
           <Key>
             <PropertyRef Name="diagram_id" />
@@ -19,8 +26,10 @@
           <Key>
             <PropertyRef Name="Id Авторизация" />
           </Key>
-          <Property Name="Id Авторизация" Type="int" Nullable="false" />
-          <Property Name="Id Клиент" Type="nchar" MaxLength="10" />
+          <Property Name="Id Авторизация" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="id role" Type="int" />
+          <Property Name="login" Type="varchar" MaxLength="100" />
+          <Property Name="password" Type="varchar(max)" />
         </EntityType>
         <EntityType Name="Договор">
           <Key>
@@ -63,8 +72,7 @@
           <Property Name="Дата рождение" Type="varchar" MaxLength="30" />
           <Property Name="Контактные данные" Type="varchar" MaxLength="50" />
           <Property Name="Паспортные данные" Type="varchar" MaxLength="50" />
-          <Property Name="login" Type="varchar" MaxLength="50" />
-          <Property Name="parol" Type="varchar" MaxLength="100" />
+          <Property Name="id Авторизация" Type="int" />
         </EntityType>
         <EntityType Name="Недвижимость">
           <Key>
@@ -112,16 +120,17 @@
           <Key>
             <PropertyRef Name="Id Сотрудник" />
           </Key>
-          <Property Name="Id Сотрудник" Type="int" Nullable="false" />
-          <Property Name="Фамилия" Type="varchar" MaxLength="20" Nullable="false" />
-          <Property Name="Имя" Type="varchar" MaxLength="20" Nullable="false" />
-          <Property Name="Отчество" Type="varchar" MaxLength="20" Nullable="false" />
-          <Property Name="Зарплата" Type="money" Nullable="false" />
-          <Property Name="Пол" Type="varchar" MaxLength="10" Nullable="false" />
-          <Property Name="Дата рождение" Type="varchar" MaxLength="20" Nullable="false" />
-          <Property Name="Контактные данные" Type="varchar" MaxLength="30" Nullable="false" />
-          <Property Name="паспортные данные" Type="varchar" MaxLength="50" Nullable="false" />
-          <Property Name="Должность" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="Id Сотрудник" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Фамилия" Type="varchar" MaxLength="20" />
+          <Property Name="Имя" Type="varchar" MaxLength="20" />
+          <Property Name="Отчество" Type="varchar" MaxLength="20" />
+          <Property Name="Зарплата" Type="money" />
+          <Property Name="Пол" Type="varchar" MaxLength="10" />
+          <Property Name="Дата рождение" Type="varchar" MaxLength="20" />
+          <Property Name="Контактные данные" Type="varchar" MaxLength="30" />
+          <Property Name="паспортные данные" Type="varchar" MaxLength="50" />
+          <Property Name="Должность" Type="varchar" MaxLength="50" />
+          <Property Name="id Авторизация" Type="int" />
         </EntityType>
         <EntityType Name="Услуга">
           <Key>
@@ -131,6 +140,18 @@
           <Property Name="Название" Type="varchar" MaxLength="70" Nullable="false" />
           <Property Name="Стоимость" Type="varchar" MaxLength="20" Nullable="false" />
         </EntityType>
+        <Association Name="FK_Авторизация_role">
+          <End Role="role" Type="Self.role" Multiplicity="0..1" />
+          <End Role="Авторизация" Type="Self.Авторизация" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="role">
+              <PropertyRef Name="id role" />
+            </Principal>
+            <Dependent Role="Авторизация">
+              <PropertyRef Name="id role" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Договор_Клиент">
           <End Role="Клиент" Type="Self.Клиент" Multiplicity="0..1" />
           <End Role="Договор" Type="Self.Договор" Multiplicity="*" />
@@ -215,6 +236,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_Клиент_Авторизация">
+          <End Role="Авторизация" Type="Self.Авторизация" Multiplicity="0..1" />
+          <End Role="Клиент" Type="Self.Клиент" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Авторизация">
+              <PropertyRef Name="Id Авторизация" />
+            </Principal>
+            <Dependent Role="Клиент">
+              <PropertyRef Name="id Авторизация" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Недвижимость_Собственник">
           <End Role="Собственник" Type="Self.Собственник" Multiplicity="1" />
           <End Role="Недвижимость" Type="Self.Недвижимость" Multiplicity="*" />
@@ -239,7 +272,20 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_Сотрудник_Авторизация">
+          <End Role="Авторизация" Type="Self.Авторизация" Multiplicity="0..1" />
+          <End Role="Сотрудник" Type="Self.Сотрудник" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Авторизация">
+              <PropertyRef Name="Id Авторизация" />
+            </Principal>
+            <Dependent Role="Сотрудник">
+              <PropertyRef Name="id Авторизация" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <EntityContainer Name="Хранилище ModelContainer">
+          <EntitySet Name="role" EntityType="Self.role" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Авторизация" EntityType="Self.Авторизация" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Договор" EntityType="Self.Договор" Schema="dbo" store:Type="Tables" />
@@ -251,6 +297,10 @@
           <EntitySet Name="Собственник" EntityType="Self.Собственник" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Сотрудник" EntityType="Self.Сотрудник" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Услуга" EntityType="Self.Услуга" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_Авторизация_role" Association="Self.FK_Авторизация_role">
+            <End Role="role" EntitySet="role" />
+            <End Role="Авторизация" EntitySet="Авторизация" />
+          </AssociationSet>
           <AssociationSet Name="FK_Договор_Клиент" Association="Self.FK_Договор_Клиент">
             <End Role="Клиент" EntitySet="Клиент" />
             <End Role="Договор" EntitySet="Договор" />
@@ -279,6 +329,10 @@
             <End Role="Услуга" EntitySet="Услуга" />
             <End Role="Заявка" EntitySet="Заявка" />
           </AssociationSet>
+          <AssociationSet Name="FK_Клиент_Авторизация" Association="Self.FK_Клиент_Авторизация">
+            <End Role="Авторизация" EntitySet="Авторизация" />
+            <End Role="Клиент" EntitySet="Клиент" />
+          </AssociationSet>
           <AssociationSet Name="FK_Недвижимость_Собственник" Association="Self.FK_Недвижимость_Собственник">
             <End Role="Собственник" EntitySet="Собственник" />
             <End Role="Недвижимость" EntitySet="Недвижимость" />
@@ -287,12 +341,24 @@
             <End Role="Сотрудник" EntitySet="Сотрудник" />
             <End Role="Отчетности" EntitySet="Отчетности" />
           </AssociationSet>
+          <AssociationSet Name="FK_Сотрудник_Авторизация" Association="Self.FK_Сотрудник_Авторизация">
+            <End Role="Авторизация" EntitySet="Авторизация" />
+            <End Role="Сотрудник" EntitySet="Сотрудник" />
+          </AssociationSet>
         </EntityContainer>
       </Schema>
     </edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="Model" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="role">
+          <Key>
+            <PropertyRef Name="id_role" />
+          </Key>
+          <Property Name="id_role" Type="Int32" Nullable="false" />
+          <Property Name="role1" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Авторизация" Relationship="Self.FK_Авторизация_role" FromRole="role" ToRole="Авторизация" />
+        </EntityType>
         <EntityType Name="sysdiagrams">
           <Key>
             <PropertyRef Name="diagram_id" />
@@ -307,8 +373,13 @@
           <Key>
             <PropertyRef Name="Id_Авторизация" />
           </Key>
-          <Property Name="Id_Авторизация" Type="Int32" Nullable="false" />
-          <Property Name="Id_Клиент" Type="String" MaxLength="10" FixedLength="true" Unicode="true" />
+          <Property Name="Id_Авторизация" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="id_role" Type="Int32" />
+          <Property Name="login" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="password" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="role" Relationship="Self.FK_Авторизация_role" FromRole="Авторизация" ToRole="role" />
+          <NavigationProperty Name="Клиент" Relationship="Self.FK_Клиент_Авторизация" FromRole="Авторизация" ToRole="Клиент" />
+          <NavigationProperty Name="Сотрудник" Relationship="Self.FK_Сотрудник_Авторизация" FromRole="Авторизация" ToRole="Сотрудник" />
         </EntityType>
         <EntityType Name="Договор">
           <Key>
@@ -359,8 +430,8 @@
           <Property Name="Дата_рождение" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
           <Property Name="Контактные_данные" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="Паспортные_данные" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="login" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="parol" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="id_Авторизация" Type="Int32" />
+          <NavigationProperty Name="Авторизация" Relationship="Self.FK_Клиент_Авторизация" FromRole="Клиент" ToRole="Авторизация" />
           <NavigationProperty Name="Договор" Relationship="Self.FK_Договор_Клиент" FromRole="Клиент" ToRole="Договор" />
           <NavigationProperty Name="Заявка" Relationship="Self.FK_Заявка_Клиент" FromRole="Клиент" ToRole="Заявка" />
         </EntityType>
@@ -414,16 +485,18 @@
           <Key>
             <PropertyRef Name="Id_Сотрудник" />
           </Key>
-          <Property Name="Id_Сотрудник" Type="Int32" Nullable="false" />
-          <Property Name="Фамилия" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="Имя" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="Отчество" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="Зарплата" Type="Decimal" Precision="19" Scale="4" Nullable="false" />
-          <Property Name="Пол" Type="String" MaxLength="10" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="Дата_рождение" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="Контактные_данные" Type="String" MaxLength="30" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="паспортные_данные" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="Должность" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Id_Сотрудник" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Фамилия" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="Имя" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="Отчество" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="Зарплата" Type="Decimal" Precision="19" Scale="4" />
+          <Property Name="Пол" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="Дата_рождение" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="Контактные_данные" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="паспортные_данные" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Должность" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="id_Авторизация" Type="Int32" />
+          <NavigationProperty Name="Авторизация" Relationship="Self.FK_Сотрудник_Авторизация" FromRole="Сотрудник" ToRole="Авторизация" />
           <NavigationProperty Name="Заявка" Relationship="Self.FK_Заявка_Сотрудник" FromRole="Сотрудник" ToRole="Заявка" />
           <NavigationProperty Name="Отчетности" Relationship="Self.FK_Отчетности_Сотрудник1" FromRole="Сотрудник" ToRole="Отчетности" />
         </EntityType>
@@ -437,6 +510,42 @@
           <NavigationProperty Name="Договор" Relationship="Self.FK_Договор_Услуга" FromRole="Услуга" ToRole="Договор" />
           <NavigationProperty Name="Заявка" Relationship="Self.FK_Заявка_Услуга" FromRole="Услуга" ToRole="Заявка" />
         </EntityType>
+        <Association Name="FK_Авторизация_role">
+          <End Role="role" Type="Self.role" Multiplicity="0..1" />
+          <End Role="Авторизация" Type="Self.Авторизация" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="role">
+              <PropertyRef Name="id_role" />
+            </Principal>
+            <Dependent Role="Авторизация">
+              <PropertyRef Name="id_role" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Клиент_Авторизация">
+          <End Role="Авторизация" Type="Self.Авторизация" Multiplicity="0..1" />
+          <End Role="Клиент" Type="Self.Клиент" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Авторизация">
+              <PropertyRef Name="Id_Авторизация" />
+            </Principal>
+            <Dependent Role="Клиент">
+              <PropertyRef Name="id_Авторизация" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Сотрудник_Авторизация">
+          <End Role="Авторизация" Type="Self.Авторизация" Multiplicity="0..1" />
+          <End Role="Сотрудник" Type="Self.Сотрудник" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Авторизация">
+              <PropertyRef Name="Id_Авторизация" />
+            </Principal>
+            <Dependent Role="Сотрудник">
+              <PropertyRef Name="id_Авторизация" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Договор_Клиент">
           <End Role="Клиент" Type="Self.Клиент" Multiplicity="0..1" />
           <End Role="Договор" Type="Self.Договор" Multiplicity="*" />
@@ -546,6 +655,7 @@
           </ReferentialConstraint>
         </Association>
         <EntityContainer Name="Пр4_Агентсво_недвижимостиEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="role" EntityType="Self.role" />
           <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" />
           <EntitySet Name="Авторизация" EntityType="Self.Авторизация" />
           <EntitySet Name="Договор" EntityType="Self.Договор" />
@@ -557,6 +667,18 @@
           <EntitySet Name="Собственник" EntityType="Self.Собственник" />
           <EntitySet Name="Сотрудник" EntityType="Self.Сотрудник" />
           <EntitySet Name="Услуга" EntityType="Self.Услуга" />
+          <AssociationSet Name="FK_Авторизация_role" Association="Self.FK_Авторизация_role">
+            <End Role="role" EntitySet="role" />
+            <End Role="Авторизация" EntitySet="Авторизация" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Клиент_Авторизация" Association="Self.FK_Клиент_Авторизация">
+            <End Role="Авторизация" EntitySet="Авторизация" />
+            <End Role="Клиент" EntitySet="Клиент" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Сотрудник_Авторизация" Association="Self.FK_Сотрудник_Авторизация">
+            <End Role="Авторизация" EntitySet="Авторизация" />
+            <End Role="Сотрудник" EntitySet="Сотрудник" />
+          </AssociationSet>
           <AssociationSet Name="FK_Договор_Клиент" Association="Self.FK_Договор_Клиент">
             <End Role="Клиент" EntitySet="Клиент" />
             <End Role="Договор" EntitySet="Договор" />
@@ -600,6 +722,14 @@
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
         <EntityContainerMapping StorageEntityContainer="Хранилище ModelContainer" CdmEntityContainer="Пр4_Агентсво_недвижимостиEntities">
+          <EntitySetMapping Name="role">
+            <EntityTypeMapping TypeName="Model.role">
+              <MappingFragment StoreEntitySet="role">
+                <ScalarProperty Name="id_role" ColumnName="id role" />
+                <ScalarProperty Name="role1" ColumnName="role" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="sysdiagrams">
             <EntityTypeMapping TypeName="Model.sysdiagrams">
               <MappingFragment StoreEntitySet="sysdiagrams">
@@ -615,7 +745,9 @@
             <EntityTypeMapping TypeName="Model.Авторизация">
               <MappingFragment StoreEntitySet="Авторизация">
                 <ScalarProperty Name="Id_Авторизация" ColumnName="Id Авторизация" />
-                <ScalarProperty Name="Id_Клиент" ColumnName="Id Клиент" />
+                <ScalarProperty Name="id_role" ColumnName="id role" />
+                <ScalarProperty Name="login" ColumnName="login" />
+                <ScalarProperty Name="password" ColumnName="password" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -662,8 +794,7 @@
                 <ScalarProperty Name="Дата_рождение" ColumnName="Дата рождение" />
                 <ScalarProperty Name="Контактные_данные" ColumnName="Контактные данные" />
                 <ScalarProperty Name="Паспортные_данные" ColumnName="Паспортные данные" />
-                <ScalarProperty Name="login" ColumnName="login" />
-                <ScalarProperty Name="parol" ColumnName="parol" />
+                <ScalarProperty Name="id_Авторизация" ColumnName="id Авторизация" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -725,6 +856,7 @@
                 <ScalarProperty Name="Контактные_данные" ColumnName="Контактные данные" />
                 <ScalarProperty Name="паспортные_данные" ColumnName="паспортные данные" />
                 <ScalarProperty Name="Должность" ColumnName="Должность" />
+                <ScalarProperty Name="id_Авторизация" ColumnName="id Авторизация" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

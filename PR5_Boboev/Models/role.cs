@@ -12,24 +12,18 @@ namespace PR5_Boboev.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class Авторизация
+    public partial class role
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public Авторизация()
+        public role()
         {
-            this.Клиент = new HashSet<Клиент>();
-            this.Сотрудник = new HashSet<Сотрудник>();
+            this.Авторизация = new HashSet<Авторизация>();
         }
     
-        public int Id_Авторизация { get; set; }
-        public Nullable<int> id_role { get; set; }
-        public string login { get; set; }
-        public string password { get; set; }
+        public int id_role { get; set; }
+        public string role1 { get; set; }
     
-        public virtual role role { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Клиент> Клиент { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Сотрудник> Сотрудник { get; set; }
+        public virtual ICollection<Авторизация> Авторизация { get; set; }
     }
 }

@@ -1,11 +1,13 @@
-﻿using System;
+﻿
+using PR5_Boboev.Models;
+using System;
 using System.Collections.Generic;
+using System.Data.Entity.Validation;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using PR5_Boboev.Models;
 
-namespace PR5_Boboev
+namespace pr5_Authorizatio_Boboev_E
 {
     internal class Helpel
     {
@@ -39,6 +41,31 @@ namespace PR5_Boboev
 
             _context.Клиент.Add(user); // Добавление записи нового пользователя в таблицу Users
             _context.SaveChanges(); // Сохранение изменений в БД
+        }
+        public void CreateSotrudnik(Сотрудник user)
+        {
+            // Убедитесь, что контекст инициализирован
+            if (_context == null)
+            {
+                _context = GetContext();
+            }
+
+            _context.Сотрудник.Add(user); // Добавление записи нового пользователя в таблицу Users
+            _context.SaveChanges(); // Сохранение изменений в БД
+        }
+
+        public void CreateAuthorization(Авторизация auth)
+        {
+            // Убедитесь, что контекст инициализирован
+            if (_context == null)
+            {
+                _context = GetContext();
+            }
+
+           
+                _context.Авторизация.Add(auth); // Добавление записи нового пользователя в таблицу Users
+                _context.SaveChanges(); // Сохранение изменений в БД
+           
         }
 
         /// <summary>
@@ -76,6 +103,20 @@ namespace PR5_Boboev
             _context.SaveChanges(); // Сохранение изменений в БД
         }
 
+        public int GetLastAuthorizationId()
+        {
+            if (_context == null)
+            {
+                _context = GetContext();
+            }
+            var lastAuth = _context.Авторизация.OrderByDescending(a => a.Id_Авторизация).FirstOrDefault();
+            if (lastAuth != null)
+            {
+                return lastAuth.Id_Авторизация;
+            }
+            throw new InvalidOperationException("Таблица Авторизация пуста.");
+        }
+
         /// <summary>
         /// Метод для фильтрации записей пользователей по имени.
         /// </summary>
@@ -105,11 +146,5 @@ namespace PR5_Boboev
 
             return _context.Клиент.OrderBy(x => x.Имя).ToList();
         }
-
-        /// <summary>
-        /// Получает тип пользователя из связанной таблицы Types.
-        /// </summary>
-        /// <param name="user">Объект пользователя, содержащий информацию о типе.</param>
-        /// <returns>Название типа пользователя.</returns>
     }
 }

@@ -28,9 +28,9 @@ namespace PR5_Boboev.Models
         public string Дата_рождение { get; set; }
         public string Контактные_данные { get; set; }
         public string Паспортные_данные { get; set; }
-        public string login { get; set; }
-        public string parol { get; set; }
+        public Nullable<int> id_Авторизация { get; set; }
     
+        public virtual Авторизация Авторизация { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Договор> Договор { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
